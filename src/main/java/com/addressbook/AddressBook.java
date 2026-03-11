@@ -8,6 +8,7 @@ import java.util.Scanner;
  * Represents an Address Book that holds a list of Contacts.
  * UC1: Basic address book with addContact capability.
  * UC2: Added editContact by first and last name.
+ * UC3: Added deleteContact by first and last name.
  */
 public class AddressBook {
 
@@ -76,6 +77,21 @@ public class AddressBook {
         if (!email.isEmpty()) found.setEmail(email);
 
         System.out.println("Contact updated successfully: " + found);
+    }
+
+    /**
+     * UC3: Delete a contact by first and last name.
+     */
+    public void deleteContact(String firstName, String lastName) {
+        boolean removed = contacts.removeIf(c ->
+                c.getFirstName().equalsIgnoreCase(firstName)
+             && c.getLastName().equalsIgnoreCase(lastName));
+
+        if (removed) {
+            System.out.println("Contact deleted successfully: " + firstName + " " + lastName);
+        } else {
+            System.out.println("Contact not found: " + firstName + " " + lastName);
+        }
     }
 
     /**

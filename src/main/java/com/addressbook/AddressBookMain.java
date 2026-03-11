@@ -6,6 +6,7 @@ import java.util.Scanner;
  * Main entry point for the Address Book System.
  * UC1: Displays welcome message and allows adding one contact via console.
  * UC2: Added menu with option to edit an existing contact by name.
+ * UC3: Added menu option to delete a contact by name.
  */
 public class AddressBookMain {
 
@@ -37,6 +38,14 @@ public class AddressBookMain {
                     addressBook.editContact(editFirst, editLast);
                     break;
                 case "3":
+                    System.out.println("\n--- Delete Contact ---");
+                    System.out.print("Enter First Name of contact to delete: ");
+                    String delFirst = scanner.nextLine().trim();
+                    System.out.print("Enter Last Name  of contact to delete: ");
+                    String delLast  = scanner.nextLine().trim();
+                    addressBook.deleteContact(delFirst, delLast);
+                    break;
+                case "4":
                     addressBook.displayContacts();
                     break;
                 case "0":
@@ -53,7 +62,8 @@ public class AddressBookMain {
         System.out.println("\n========== Menu ==========");
         System.out.println("1. Add Contact");
         System.out.println("2. Edit Contact");
-        System.out.println("3. Display All Contacts");
+        System.out.println("3. Delete Contact");
+        System.out.println("4. Display All Contacts");
         System.out.println("0. Exit");
         System.out.print("Choose: ");
     }
