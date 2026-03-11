@@ -5,6 +5,7 @@ import java.util.Scanner;
 /**
  * Main entry point for the Address Book System.
  * UC1: Displays welcome message and allows adding one contact via console.
+ * UC2: Added menu with option to edit an existing contact by name.
  */
 public class AddressBookMain {
 
@@ -15,15 +16,46 @@ public class AddressBookMain {
         System.out.println("   Welcome to Address Book Program      ");
         System.out.println("========================================");
 
-        // UC1: Create a default address book and add one contact
         AddressBook addressBook = new AddressBook("MyAddressBook");
+        boolean running = true;
 
-        System.out.println("\n--- Add New Contact ---");
-        Contact contact = readContactFromConsole();
-        addressBook.addContact(contact);
+        while (running) {
+            printMenu();
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    System.out.println("\n--- Add New Contact ---");
+                    Contact contact = readContactFromConsole();
+                    addressBook.addContact(contact);
+                    break;
+                case "2":
+                    System.out.println("\n--- Edit Contact ---");
+                    System.out.print("Enter First Name of contact to edit: ");
+                    String editFirst = scanner.nextLine().trim();
+                    System.out.print("Enter Last Name  of contact to edit: ");
+                    String editLast  = scanner.nextLine().trim();
+                    addressBook.editContact(editFirst, editLast);
+                    break;
+                case "3":
+                    addressBook.displayContacts();
+                    break;
+                case "0":
+                    running = false;
+                    System.out.println("Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
 
-        System.out.println("\n--- All Contacts ---");
-        addressBook.displayContacts();
+    private static void printMenu() {
+        System.out.println("\n========== Menu ==========");
+        System.out.println("1. Add Contact");
+        System.out.println("2. Edit Contact");
+        System.out.println("3. Display All Contacts");
+        System.out.println("0. Exit");
+        System.out.print("Choose: ");
     }
 
     /**
