@@ -9,6 +9,8 @@ import java.util.Scanner;
  * UC3: Added menu option to delete a contact by name.
  * UC4: Added menu option to add multiple contacts via loop.
  * UC5: Refactored to use AddressBookSystem with multiple named address books.
+ * UC6: Duplicate entry is rejected in addContact.
+ * UC7: Added global search by city and state across all address books.
  */
 public class AddressBookMain {
 
@@ -34,16 +36,27 @@ public class AddressBookMain {
                     break;
                 case "2":
                     system.listAddressBooks();
-                    System.out.print("Enter Address Book name to switch to: ");
+                    System.out.print("Enter Address Book name to open: ");
                     String bookName = scanner.nextLine().trim();
                     currentBook = system.getAddressBook(bookName);
                     if (currentBook != null) {
-                        System.out.println("Now working with Address Book: " + currentBook.getName());
+                        System.out.println("Opened: " + currentBook.getName());
                         runAddressBookMenu();
                     }
                     break;
                 case "3":
                     system.listAddressBooks();
+                    break;
+                // UC7: Global Search
+                case "4":
+                    System.out.print("Search by city - Enter city name: ");
+                    String city = scanner.nextLine().trim();
+                    system.searchByCity(city);
+                    break;
+                case "5":
+                    System.out.print("Search by state - Enter state name: ");
+                    String state = scanner.nextLine().trim();
+                    system.searchByState(state);
                     break;
                 case "0":
                     running = false;
@@ -60,6 +73,8 @@ public class AddressBookMain {
         System.out.println("1. Create New Address Book");
         System.out.println("2. Open Address Book");
         System.out.println("3. List All Address Books");
+        System.out.println("4. Search by City  (across all books)");
+        System.out.println("5. Search by State (across all books)");
         System.out.println("0. Exit");
         System.out.print("Choose: ");
     }

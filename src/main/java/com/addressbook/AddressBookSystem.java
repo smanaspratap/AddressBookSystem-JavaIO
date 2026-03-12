@@ -1,11 +1,14 @@
 package com.addressbook;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Manages multiple Address Books identified by unique names.
  * UC5: Introduced AddressBookSystem to hold a HashMap of AddressBook by name.
+ * UC7: Added searchByCity and searchByState across all address books using Java Streams.
  */
 public class AddressBookSystem {
 
@@ -49,7 +52,46 @@ public class AddressBookSystem {
         }
         System.out.println("\n=== Available Address Books ===");
         addressBooks.keySet().forEach(name ->
-                System.out.println("  - " + name + " (" + addressBooks.get(name).getContacts().size() + " contacts)"));
+                System.out.println("  - " + name + " ("
+                        + addressBooks.get(name).getContacts().size() + " contacts)"));
+    }
+
+    /**
+     * UC7: Search for contacts by city across ALL address books using Java Streams.
+     * Returns multiple results.
+     */
+    public void searchByCity(String city) {
+        System.out.println("\n=== Search Results - City: " + city + " ===");
+        List<Contact> results = addressBooks.values().stream()
+                .flatMap(book -> book.getContacts().stream())
+                .filter(c -> c.getCity().equalsIgnoreCase(city))
+                .collect(Collectors.toList());
+
+        if (results.isEmpty()) {
+            System.out.println("No contacts found in city: " + city);
+        } else {
+            results.forEach(System.out::println);
+            System.out.println("Total found: " + results.size());
+        }
+    }
+
+    /**
+     * UC7: Search for contacts by state across ALL address books using Java Streams.
+     * Returns multiple results.
+     */
+    public void searchByState(String state) {
+        System.out.println("\n=== Search Results - State: " + state + " ===");
+        List<Contact> results = addressBooks.values().stream()
+                .flatMap(book -> book.getContacts().stream())
+                .filter(c -> c.getState().equalsIgnoreCase(state))
+                .collect(Collectors.toList());
+
+        if (results.isEmpty()) {
+            System.out.println("No contacts found in state: " + state);
+        } else {
+            results.forEach(System.out::println);
+            System.out.println("Total found: " + results.size());
+        }
     }
 
     public Map<String, AddressBook> getAllAddressBooks() {
