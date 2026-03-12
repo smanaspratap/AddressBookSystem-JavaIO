@@ -9,6 +9,7 @@ import java.util.Scanner;
  * UC1: Basic address book with addContact capability.
  * UC2: Added editContact by first and last name.
  * UC3: Added deleteContact by first and last name.
+ * UC4: Added addMultipleContacts - loop to add contacts one at a time.
  */
 public class AddressBook {
 
@@ -26,7 +27,7 @@ public class AddressBook {
     public List<Contact> getContacts() { return contacts; }
 
     /**
-     * UC1: Add a contact to this address book.
+     * UC1: Add a single contact to this address book.
      */
     public void addContact(Contact contact) {
         contacts.add(contact);
@@ -92,6 +93,21 @@ public class AddressBook {
         } else {
             System.out.println("Contact not found: " + firstName + " " + lastName);
         }
+    }
+
+    /**
+     * UC4: Add multiple contacts one at a time in a loop until user says 'n'.
+     */
+    public void addMultipleContacts() {
+        String addMore = "y";
+        while (addMore.equalsIgnoreCase("y")) {
+            System.out.println("\n--- Enter Contact Details ---");
+            Contact contact = AddressBookMain.readContactFromConsole();
+            addContact(contact);
+            System.out.print("Add another contact? (y/n): ");
+            addMore = scanner.nextLine().trim();
+        }
+        System.out.println("Finished adding contacts.");
     }
 
     /**

@@ -7,6 +7,7 @@ import java.util.Scanner;
  * UC1: Displays welcome message and allows adding one contact via console.
  * UC2: Added menu with option to edit an existing contact by name.
  * UC3: Added menu option to delete a contact by name.
+ * UC4: Added menu option to add multiple contacts via loop.
  */
 public class AddressBookMain {
 
@@ -25,11 +26,15 @@ public class AddressBookMain {
             String choice = scanner.nextLine().trim();
             switch (choice) {
                 case "1":
-                    System.out.println("\n--- Add New Contact ---");
+                    System.out.println("\n--- Add Single Contact ---");
                     Contact contact = readContactFromConsole();
                     addressBook.addContact(contact);
                     break;
                 case "2":
+                    System.out.println("\n--- Add Multiple Contacts ---");
+                    addressBook.addMultipleContacts();
+                    break;
+                case "3":
                     System.out.println("\n--- Edit Contact ---");
                     System.out.print("Enter First Name of contact to edit: ");
                     String editFirst = scanner.nextLine().trim();
@@ -37,7 +42,7 @@ public class AddressBookMain {
                     String editLast  = scanner.nextLine().trim();
                     addressBook.editContact(editFirst, editLast);
                     break;
-                case "3":
+                case "4":
                     System.out.println("\n--- Delete Contact ---");
                     System.out.print("Enter First Name of contact to delete: ");
                     String delFirst = scanner.nextLine().trim();
@@ -45,7 +50,7 @@ public class AddressBookMain {
                     String delLast  = scanner.nextLine().trim();
                     addressBook.deleteContact(delFirst, delLast);
                     break;
-                case "4":
+                case "5":
                     addressBook.displayContacts();
                     break;
                 case "0":
@@ -60,10 +65,11 @@ public class AddressBookMain {
 
     private static void printMenu() {
         System.out.println("\n========== Menu ==========");
-        System.out.println("1. Add Contact");
-        System.out.println("2. Edit Contact");
-        System.out.println("3. Delete Contact");
-        System.out.println("4. Display All Contacts");
+        System.out.println("1. Add Single Contact");
+        System.out.println("2. Add Multiple Contacts");
+        System.out.println("3. Edit Contact");
+        System.out.println("4. Delete Contact");
+        System.out.println("5. Display All Contacts");
         System.out.println("0. Exit");
         System.out.print("Choose: ");
     }
