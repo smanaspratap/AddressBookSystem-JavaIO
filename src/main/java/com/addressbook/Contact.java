@@ -1,8 +1,11 @@
 package com.addressbook;
 
+import java.util.Objects;
+
 /**
  * Represents a Contact in the Address Book.
  * UC1: Basic contact with all required fields.
+ * UC6: Overridden equals() and hashCode() to detect duplicates by first + last name.
  */
 public class Contact {
 
@@ -53,6 +56,22 @@ public class Contact {
     public void setZip(String zip)                 { this.zip         = zip;         }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setEmail(String email)             { this.email       = email;       }
+
+    // ── UC6: Duplicate detection by first + last name ─────────────────────
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Contact)) return false;
+        Contact other = (Contact) obj;
+        return firstName.equalsIgnoreCase(other.firstName)
+            && lastName.equalsIgnoreCase(other.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName.toLowerCase(), lastName.toLowerCase());
+    }
 
     // ── toString ─────────────────────────────────────────────────────────────
 

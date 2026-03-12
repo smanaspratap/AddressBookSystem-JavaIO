@@ -10,6 +10,8 @@ import java.util.Scanner;
  * UC2: Added editContact by first and last name.
  * UC3: Added deleteContact by first and last name.
  * UC4: Added addMultipleContacts - loop to add contacts one at a time.
+ * UC5: Used by AddressBookSystem; has a unique name.
+ * UC6: addContact now checks for duplicates using Java Streams + equals().
  */
 public class AddressBook {
 
@@ -27,9 +29,20 @@ public class AddressBook {
     public List<Contact> getContacts() { return contacts; }
 
     /**
-     * UC1: Add a single contact to this address book.
+     * UC1 + UC6: Add a single contact to this address book.
+     * UC6: Checks for duplicate by name using Java Streams before adding.
      */
     public void addContact(Contact contact) {
+        // UC6: Duplicate check using Stream + equals() (overridden on firstName + lastName)
+        boolean isDuplicate = contacts.stream()
+                .anyMatch(c -> c.equals(contact));
+
+        if (isDuplicate) {
+            System.out.println("Duplicate entry! Contact already exists: "
+                    + contact.getFirstName() + " " + contact.getLastName());
+            return;
+        }
+
         contacts.add(contact);
         System.out.println("Contact added successfully: " + contact.getFirstName()
                 + " " + contact.getLastName());
