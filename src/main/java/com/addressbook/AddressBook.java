@@ -1,17 +1,20 @@
 package com.addressbook;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Represents an Address Book that holds a list of Contacts.
- * UC1: Basic address book with addContact capability.
- * UC2: Added editContact by first and last name.
- * UC3: Added deleteContact by first and last name.
- * UC4: Added addMultipleContacts - loop to add contacts one at a time.
- * UC5: Used by AddressBookSystem; has a unique name.
- * UC6: addContact now checks for duplicates using Java Streams + equals().
+ * UC1:  addContact.
+ * UC2:  editContact.
+ * UC3:  deleteContact.
+ * UC4:  addMultipleContacts loop.
+ * UC5:  Has a unique name, used in AddressBookSystem.
+ * UC6:  Duplicate check using Stream + equals().
+ * UC10: getSortedByName() - sort contacts alphabetically by name using Java Streams.
  */
 public class AddressBook {
 
@@ -24,115 +27,99 @@ public class AddressBook {
         this.contacts = new ArrayList<>();
     }
 
-    public String getName() { return name; }
-
+    public String getName()            { return name;     }
     public List<Contact> getContacts() { return contacts; }
 
     /**
-     * UC1 + UC6: Add a single contact to this address book.
-     * UC6: Checks for duplicate by name using Java Streams before adding.
+     * UC1 + UC6: Add a contact with duplicate check via Java Streams + equals().
      */
     public void addContact(Contact contact) {
-        // UC6: Duplicate check using Stream + equals() (overridden on firstName + lastName)
-        boolean isDuplicate = contacts.stream()
-                .anyMatch(c -> c.equals(contact));
-
+        boolean isDuplicate = contacts.stream().anyMatch(c -> c.equals(contact));
         if (isDuplicate) {
             System.out.println("Duplicate entry! Contact already exists: "
                     + contact.getFirstName() + " " + contact.getLastName());
             return;
         }
-
         contacts.add(contact);
-        System.out.println("Contact added successfully: " + contact.getFirstName()
-                + " " + contact.getLastName());
+        System.out.println("Contact added: " + contact.getFirstName() + " " + contact.getLastName());
     }
 
     /**
-     * UC2: Edit an existing contact by first and last name.
+     * UC2: Edit contact by name.
      */
     public void editContact(String firstName, String lastName) {
         Contact found = contacts.stream()
                 .filter(c -> c.getFirstName().equalsIgnoreCase(firstName)
                           && c.getLastName().equalsIgnoreCase(lastName))
-                .findFirst()
-                .orElse(null);
-
-        if (found == null) {
-            System.out.println("Contact not found: " + firstName + " " + lastName);
-            return;
-        }
-
-        System.out.println("Editing contact: " + found);
-        System.out.println("(Press ENTER to keep current value)");
-
-        System.out.print("New Address [" + found.getAddress() + "] : ");
-        String address = scanner.nextLine().trim();
-        if (!address.isEmpty()) found.setAddress(address);
-
-        System.out.print("New City [" + found.getCity() + "] : ");
-        String city = scanner.nextLine().trim();
-        if (!city.isEmpty()) found.setCity(city);
-
-        System.out.print("New State [" + found.getState() + "] : ");
-        String state = scanner.nextLine().trim();
-        if (!state.isEmpty()) found.setState(state);
-
-        System.out.print("New Zip [" + found.getZip() + "] : ");
-        String zip = scanner.nextLine().trim();
-        if (!zip.isEmpty()) found.setZip(zip);
-
-        System.out.print("New Phone [" + found.getPhoneNumber() + "] : ");
-        String phone = scanner.nextLine().trim();
-        if (!phone.isEmpty()) found.setPhoneNumber(phone);
-
-        System.out.print("New Email [" + found.getEmail() + "] : ");
-        String email = scanner.nextLine().trim();
-        if (!email.isEmpty()) found.setEmail(email);
-
-        System.out.println("Contact updated successfully: " + found);
+                .findFirst().orElse(null);
+        if (found == null) { System.out.println("Contact not found: " + firstName + " " + lastName); return; }
+        System.out.println("Editing: " + found + "\n(Press ENTER to keep current value)");
+        System.out.print("Address [" + found.getAddress() + "]: ");
+        String v; if (!(v = scanner.nextLine().trim()).isEmpty()) found.setAddress(v);
+        System.out.print("City    [" + found.getCity()    + "]: ");
+        if (!(v = scanner.nextLine().trim()).isEmpty()) found.setCity(v);
+        System.out.print("State   [" + found.getState()   + "]: ");
+        if (!(v = scanner.nextLine().trim()).isEmpty()) found.setState(v);
+        System.out.print("Zip     [" + found.getZip()     + "]: ");
+        if (!(v = scanner.nextLine().trim()).isEmpty()) found.setZip(v);
+        System.out.print("Phone   [" + found.getPhoneNumber() + "]: ");
+        if (!(v = scanner.nextLine().trim()).isEmpty()) found.setPhoneNumber(v);
+        System.out.print("Email   [" + found.getEmail()   + "]: ");
+        if (!(v = scanner.nextLine().trim()).isEmpty()) found.setEmail(v);
+        System.out.println("Updated: " + found);
     }
 
     /**
-     * UC3: Delete a contact by first and last name.
+     * UC3: Delete contact by name.
      */
     public void deleteContact(String firstName, String lastName) {
         boolean removed = contacts.removeIf(c ->
-                c.getFirstName().equalsIgnoreCase(firstName)
-             && c.getLastName().equalsIgnoreCase(lastName));
-
-        if (removed) {
-            System.out.println("Contact deleted successfully: " + firstName + " " + lastName);
-        } else {
-            System.out.println("Contact not found: " + firstName + " " + lastName);
-        }
+                c.getFirstName().equalsIgnoreCase(firstName) && c.getLastName().equalsIgnoreCase(lastName));
+        System.out.println(removed
+                ? "Deleted: " + firstName + " " + lastName
+                : "Not found: " + firstName + " " + lastName);
     }
 
     /**
-     * UC4: Add multiple contacts one at a time in a loop until user says 'n'.
+     * UC4: Loop to add multiple contacts.
      */
     public void addMultipleContacts() {
-        String addMore = "y";
-        while (addMore.equalsIgnoreCase("y")) {
-            System.out.println("\n--- Enter Contact Details ---");
-            Contact contact = AddressBookMain.readContactFromConsole();
-            addContact(contact);
-            System.out.print("Add another contact? (y/n): ");
-            addMore = scanner.nextLine().trim();
+        String more = "y";
+        while (more.equalsIgnoreCase("y")) {
+            addContact(AddressBookMain.readContactFromConsole());
+            System.out.print("Add another? (y/n): ");
+            more = scanner.nextLine().trim();
         }
-        System.out.println("Finished adding contacts.");
+        System.out.println("Done adding contacts.");
     }
 
     /**
-     * Display all contacts in this address book.
+     * UC10: Sort contacts alphabetically by name using Java Streams and Comparator.
+     */
+    public List<Contact> getSortedByName() {
+        return contacts.stream()
+                .sorted(Comparator.comparing(c ->
+                        (c.getFirstName() + " " + c.getLastName()).toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Display all contacts (UC1 / UC4).
      */
     public void displayContacts() {
-        if (contacts.isEmpty()) {
-            System.out.println("No contacts found in Address Book: " + name);
-            return;
-        }
+        if (contacts.isEmpty()) { System.out.println("No contacts in: " + name); return; }
         System.out.println("\n=== Address Book: " + name + " ===");
         contacts.forEach(System.out::println);
-        System.out.println("Total contacts: " + contacts.size());
+        System.out.println("Total: " + contacts.size());
+    }
+
+    /**
+     * UC10: Display contacts sorted alphabetically by name.
+     */
+    public void displaySortedByName() {
+        List<Contact> sorted = getSortedByName();
+        System.out.println("\n=== [" + name + "] Sorted by Name ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts."); return; }
+        sorted.forEach(System.out::println);
     }
 }
