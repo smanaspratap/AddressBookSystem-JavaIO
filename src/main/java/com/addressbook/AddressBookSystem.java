@@ -1,5 +1,6 @@
 package com.addressbook;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,19 +8,17 @@ import java.util.stream.Collectors;
 
 /**
  * Manages multiple Address Books identified by unique names.
- * UC5: Introduced AddressBookSystem to hold a HashMap of AddressBook by name.
- * UC7: Added searchByCity and searchByState across all address books using Java Streams.
- * UC8: Maintain cityMap and stateMap dictionaries for viewing persons by city or state.
+ * UC5:  HashMap of AddressBook by name.
+ * UC7:  searchByCity / searchByState across all books using Java Streams.
+ * UC8:  cityMap / stateMap dictionaries (Collectors.groupingBy).
+ * UC9:  countByCity / countByState using Collectors.counting().
+ * UC10: getSortedByName() - sort all contacts alphabetically by name.
+ * UC11: getSortedByCity() / getSortedByState() / getSortedByZip().
  */
 public class AddressBookSystem {
 
-    // Dictionary of Address Book Name -> AddressBook
     private Map<String, AddressBook> addressBooks;
-
-    // UC8: City -> List<Contact> dictionary
     private Map<String, List<Contact>> cityMap;
-
-    // UC8: State -> List<Contact> dictionary
     private Map<String, List<Contact>> stateMap;
 
     public AddressBookSystem() {
@@ -28,9 +27,8 @@ public class AddressBookSystem {
         this.stateMap     = new HashMap<>();
     }
 
-    /**
-     * UC5: Create and add a new Address Book with the given name.
-     */
+    // ── UC5 ─────────────────────────────────────────────────────────────────
+
     public void addAddressBook(String name) {
         if (addressBooks.containsKey(name)) {
             System.out.println("Address Book already exists: " + name);
@@ -40,91 +38,48 @@ public class AddressBookSystem {
         }
     }
 
-    /**
-     * UC5: Get an Address Book by name.
-     */
     public AddressBook getAddressBook(String name) {
         AddressBook book = addressBooks.get(name);
-        if (book == null) {
-            System.out.println("Address Book not found: " + name);
-        }
+        if (book == null) System.out.println("Address Book not found: " + name);
         return book;
     }
 
-    /**
-     * UC5: List all available Address Book names.
-     */
     public void listAddressBooks() {
-        if (addressBooks.isEmpty()) {
-            System.out.println("No Address Books found.");
-            return;
-        }
+        if (addressBooks.isEmpty()) { System.out.println("No Address Books found."); return; }
         System.out.println("\n=== Available Address Books ===");
-        addressBooks.keySet().forEach(name ->
-                System.out.println("  - " + name + " ("
-                        + addressBooks.get(name).getContacts().size() + " contacts)"));
+        addressBooks.keySet().forEach(n ->
+                System.out.println("  - " + n + " (" + addressBooks.get(n).getContacts().size() + " contacts)"));
     }
 
-    /**
-     * UC7: Search for contacts by city across ALL address books using Java Streams.
-     */
+    // ── UC7 ─────────────────────────────────────────────────────────────────
+
     public void searchByCity(String city) {
-        System.out.println("\n=== Search Results - City: " + city + " ===");
-        List<Contact> results = addressBooks.values().stream()
-                .flatMap(book -> book.getContacts().stream())
+        System.out.println("\n=== Search - City: " + city + " ===");
+        List<Contact> results = allContacts().stream()
                 .filter(c -> c.getCity().equalsIgnoreCase(city))
                 .collect(Collectors.toList());
-
-        if (results.isEmpty()) {
-            System.out.println("No contacts found in city: " + city);
-        } else {
-            results.forEach(System.out::println);
-            System.out.println("Total found: " + results.size());
-        }
+        printResults(results, "city: " + city);
     }
 
-    /**
-     * UC7: Search for contacts by state across ALL address books using Java Streams.
-     */
     public void searchByState(String state) {
-        System.out.println("\n=== Search Results - State: " + state + " ===");
-        List<Contact> results = addressBooks.values().stream()
-                .flatMap(book -> book.getContacts().stream())
+        System.out.println("\n=== Search - State: " + state + " ===");
+        List<Contact> results = allContacts().stream()
                 .filter(c -> c.getState().equalsIgnoreCase(state))
                 .collect(Collectors.toList());
-
-        if (results.isEmpty()) {
-            System.out.println("No contacts found in state: " + state);
-        } else {
-            results.forEach(System.out::println);
-            System.out.println("Total found: " + results.size());
-        }
+        printResults(results, "state: " + state);
     }
 
-    /**
-     * UC8: Rebuild cityMap and stateMap dictionaries using Java Streams + Collectors.groupingBy.
-     * Should be called after any add/delete/edit operation.
-     */
+    // ── UC8 ─────────────────────────────────────────────────────────────────
+
     public void refreshDictionaries() {
-        List<Contact> all = addressBooks.values().stream()
-                .flatMap(book -> book.getContacts().stream())
-                .collect(Collectors.toList());
-
-        cityMap  = all.stream().collect(Collectors.groupingBy(
-                c -> c.getCity().toLowerCase()));
-        stateMap = all.stream().collect(Collectors.groupingBy(
-                c -> c.getState().toLowerCase()));
+        List<Contact> all = allContacts();
+        cityMap  = all.stream().collect(Collectors.groupingBy(c -> c.getCity().toLowerCase()));
+        stateMap = all.stream().collect(Collectors.groupingBy(c -> c.getState().toLowerCase()));
     }
 
-    /**
-     * UC8: View all persons grouped by city.
-     */
     public void viewByCity() {
         refreshDictionaries();
-        if (cityMap.isEmpty()) {
-            System.out.println("No contacts available.");
-            return;
-        }
+        if (cityMap.isEmpty()) { System.out.println("No contacts available."); return; }
         System.out.println("\n=== Persons by City ===");
         cityMap.forEach((city, contacts) -> {
             System.out.println("\nCity: " + city.toUpperCase());
@@ -132,15 +87,9 @@ public class AddressBookSystem {
         });
     }
 
-    /**
-     * UC8: View all persons grouped by state.
-     */
     public void viewByState() {
         refreshDictionaries();
-        if (stateMap.isEmpty()) {
-            System.out.println("No contacts available.");
-            return;
-        }
+        if (stateMap.isEmpty()) { System.out.println("No contacts available."); return; }
         System.out.println("\n=== Persons by State ===");
         stateMap.forEach((state, contacts) -> {
             System.out.println("\nState: " + state.toUpperCase());
@@ -148,10 +97,102 @@ public class AddressBookSystem {
         });
     }
 
-    public Map<String, AddressBook> getAllAddressBooks() {
-        return addressBooks;
+    // ── UC9 ─────────────────────────────────────────────────────────────────
+
+    /**
+     * UC9: Count contacts by City using Java Streams + Collectors.groupingBy + counting.
+     */
+    public void countByCity() {
+        Map<String, Long> counts = allContacts().stream()
+                .collect(Collectors.groupingBy(c -> c.getCity().toLowerCase(), Collectors.counting()));
+        System.out.println("\n=== Contact Count by City ===");
+        if (counts.isEmpty()) { System.out.println("No contacts available."); return; }
+        counts.forEach((city, count) ->
+                System.out.println("  " + city.toUpperCase() + " : " + count));
     }
 
-    public Map<String, List<Contact>> getCityMap()  { return cityMap;  }
-    public Map<String, List<Contact>> getStateMap() { return stateMap; }
+    /**
+     * UC9: Count contacts by State using Java Streams + Collectors.groupingBy + counting.
+     */
+    public void countByState() {
+        Map<String, Long> counts = allContacts().stream()
+                .collect(Collectors.groupingBy(c -> c.getState().toLowerCase(), Collectors.counting()));
+        System.out.println("\n=== Contact Count by State ===");
+        if (counts.isEmpty()) { System.out.println("No contacts available."); return; }
+        counts.forEach((state, count) ->
+                System.out.println("  " + state.toUpperCase() + " : " + count));
+    }
+
+    // ── UC10 ─────────────────────────────────────────────────────────────────
+
+    /**
+     * UC10: Get all contacts sorted alphabetically by first+last name using Java Streams.
+     */
+    public void displaySortedByName() {
+        List<Contact> sorted = allContacts().stream()
+                .sorted(Comparator.comparing(c -> (c.getFirstName() + " " + c.getLastName()).toLowerCase()))
+                .collect(Collectors.toList());
+        System.out.println("\n=== All Contacts Sorted by Name ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts available."); return; }
+        sorted.forEach(System.out::println);
+    }
+
+    // ── UC11 ─────────────────────────────────────────────────────────────────
+
+    /**
+     * UC11: Sort all contacts by City using Java Streams.
+     */
+    public void displaySortedByCity() {
+        List<Contact> sorted = allContacts().stream()
+                .sorted(Comparator.comparing(c -> c.getCity().toLowerCase()))
+                .collect(Collectors.toList());
+        System.out.println("\n=== All Contacts Sorted by City ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts available."); return; }
+        sorted.forEach(System.out::println);
+    }
+
+    /**
+     * UC11: Sort all contacts by State using Java Streams.
+     */
+    public void displaySortedByState() {
+        List<Contact> sorted = allContacts().stream()
+                .sorted(Comparator.comparing(c -> c.getState().toLowerCase()))
+                .collect(Collectors.toList());
+        System.out.println("\n=== All Contacts Sorted by State ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts available."); return; }
+        sorted.forEach(System.out::println);
+    }
+
+    /**
+     * UC11: Sort all contacts by Zip using Java Streams.
+     */
+    public void displaySortedByZip() {
+        List<Contact> sorted = allContacts().stream()
+                .sorted(Comparator.comparing(Contact::getZip))
+                .collect(Collectors.toList());
+        System.out.println("\n=== All Contacts Sorted by Zip ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts available."); return; }
+        sorted.forEach(System.out::println);
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    private List<Contact> allContacts() {
+        return addressBooks.values().stream()
+                .flatMap(book -> book.getContacts().stream())
+                .collect(Collectors.toList());
+    }
+
+    private void printResults(List<Contact> results, String label) {
+        if (results.isEmpty()) {
+            System.out.println("No contacts found for " + label);
+        } else {
+            results.forEach(System.out::println);
+            System.out.println("Total found: " + results.size());
+        }
+    }
+
+    public Map<String, AddressBook> getAllAddressBooks() { return addressBooks; }
+    public Map<String, List<Contact>> getCityMap()       { return cityMap;      }
+    public Map<String, List<Contact>> getStateMap()      { return stateMap;     }
 }
