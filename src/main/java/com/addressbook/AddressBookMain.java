@@ -4,13 +4,14 @@ import java.util.Scanner;
 
 /**
  * Main entry point for the Address Book System.
- * UC1: Displays welcome message and allows adding one contact via console.
- * UC2: Added menu with option to edit an existing contact by name.
- * UC3: Added menu option to delete a contact by name.
- * UC4: Added menu option to add multiple contacts via loop.
- * UC5: Refactored to use AddressBookSystem with multiple named address books.
- * UC6: Duplicate entry is rejected in addContact.
- * UC7: Added global search by city and state across all address books.
+ * UC1: Welcome message and add contact.
+ * UC2: Edit contact by name.
+ * UC3: Delete contact by name.
+ * UC4: Add multiple contacts via loop.
+ * UC5: Multiple address books via AddressBookSystem.
+ * UC6: Duplicate entry rejected.
+ * UC7: Search by city/state across all books.
+ * UC8: View persons grouped by city or state (dictionary).
  */
 public class AddressBookMain {
 
@@ -49,14 +50,21 @@ public class AddressBookMain {
                     break;
                 // UC7: Global Search
                 case "4":
-                    System.out.print("Search by city - Enter city name: ");
-                    String city = scanner.nextLine().trim();
-                    system.searchByCity(city);
+                    System.out.print("Enter city to search: ");
+                    String searchCity = scanner.nextLine().trim();
+                    system.searchByCity(searchCity);
                     break;
                 case "5":
-                    System.out.print("Search by state - Enter state name: ");
-                    String state = scanner.nextLine().trim();
-                    system.searchByState(state);
+                    System.out.print("Enter state to search: ");
+                    String searchState = scanner.nextLine().trim();
+                    system.searchByState(searchState);
+                    break;
+                // UC8: View by dictionary
+                case "6":
+                    system.viewByCity();
+                    break;
+                case "7":
+                    system.viewByState();
                     break;
                 case "0":
                     running = false;
@@ -73,8 +81,10 @@ public class AddressBookMain {
         System.out.println("1. Create New Address Book");
         System.out.println("2. Open Address Book");
         System.out.println("3. List All Address Books");
-        System.out.println("4. Search by City  (across all books)");
-        System.out.println("5. Search by State (across all books)");
+        System.out.println("4. Search by City  (UC7)");
+        System.out.println("5. Search by State (UC7)");
+        System.out.println("6. View All by City  (UC8)");
+        System.out.println("7. View All by State (UC8)");
         System.out.println("0. Exit");
         System.out.print("Choose: ");
     }

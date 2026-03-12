@@ -9,14 +9,23 @@ import java.util.stream.Collectors;
  * Manages multiple Address Books identified by unique names.
  * UC5: Introduced AddressBookSystem to hold a HashMap of AddressBook by name.
  * UC7: Added searchByCity and searchByState across all address books using Java Streams.
+ * UC8: Maintain cityMap and stateMap dictionaries for viewing persons by city or state.
  */
 public class AddressBookSystem {
 
     // Dictionary of Address Book Name -> AddressBook
     private Map<String, AddressBook> addressBooks;
 
+    // UC8: City -> List<Contact> dictionary
+    private Map<String, List<Contact>> cityMap;
+
+    // UC8: State -> List<Contact> dictionary
+    private Map<String, List<Contact>> stateMap;
+
     public AddressBookSystem() {
         this.addressBooks = new HashMap<>();
+        this.cityMap      = new HashMap<>();
+        this.stateMap     = new HashMap<>();
     }
 
     /**
@@ -58,7 +67,6 @@ public class AddressBookSystem {
 
     /**
      * UC7: Search for contacts by city across ALL address books using Java Streams.
-     * Returns multiple results.
      */
     public void searchByCity(String city) {
         System.out.println("\n=== Search Results - City: " + city + " ===");
@@ -77,7 +85,6 @@ public class AddressBookSystem {
 
     /**
      * UC7: Search for contacts by state across ALL address books using Java Streams.
-     * Returns multiple results.
      */
     public void searchByState(String state) {
         System.out.println("\n=== Search Results - State: " + state + " ===");
@@ -94,7 +101,57 @@ public class AddressBookSystem {
         }
     }
 
+    /**
+     * UC8: Rebuild cityMap and stateMap dictionaries using Java Streams + Collectors.groupingBy.
+     * Should be called after any add/delete/edit operation.
+     */
+    public void refreshDictionaries() {
+        List<Contact> all = addressBooks.values().stream()
+                .flatMap(book -> book.getContacts().stream())
+                .collect(Collectors.toList());
+
+        cityMap  = all.stream().collect(Collectors.groupingBy(
+                c -> c.getCity().toLowerCase()));
+        stateMap = all.stream().collect(Collectors.groupingBy(
+                c -> c.getState().toLowerCase()));
+    }
+
+    /**
+     * UC8: View all persons grouped by city.
+     */
+    public void viewByCity() {
+        refreshDictionaries();
+        if (cityMap.isEmpty()) {
+            System.out.println("No contacts available.");
+            return;
+        }
+        System.out.println("\n=== Persons by City ===");
+        cityMap.forEach((city, contacts) -> {
+            System.out.println("\nCity: " + city.toUpperCase());
+            contacts.forEach(c -> System.out.println("  " + c));
+        });
+    }
+
+    /**
+     * UC8: View all persons grouped by state.
+     */
+    public void viewByState() {
+        refreshDictionaries();
+        if (stateMap.isEmpty()) {
+            System.out.println("No contacts available.");
+            return;
+        }
+        System.out.println("\n=== Persons by State ===");
+        stateMap.forEach((state, contacts) -> {
+            System.out.println("\nState: " + state.toUpperCase());
+            contacts.forEach(c -> System.out.println("  " + c));
+        });
+    }
+
     public Map<String, AddressBook> getAllAddressBooks() {
         return addressBooks;
     }
+
+    public Map<String, List<Contact>> getCityMap()  { return cityMap;  }
+    public Map<String, List<Contact>> getStateMap() { return stateMap; }
 }
