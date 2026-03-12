@@ -73,18 +73,23 @@ public class Contact {
         return Objects.hash(firstName.toLowerCase(), lastName.toLowerCase());
     }
 
-    // ── toString ─────────────────────────────────────────────────────────────
+    // ── UC12: Clean toString for alphabetical sort display ────────────────────
 
+    /**
+     * UC12: Override toString to display contact details in a clean, readable format.
+     * Used when sorting alphabetically and printing to console.
+     */
     @Override
     public String toString() {
-        return "Contact{" +
-               "Name='"        + firstName + " " + lastName + "'" +
-               ", Address='"   + address   + "'" +
-               ", City='"      + city      + "'" +
-               ", State='"     + state     + "'" +
-               ", Zip='"       + zip       + "'" +
-               ", Phone='"     + phoneNumber + "'" +
-               ", Email='"     + email     + "'" +
-               "}";
+        return String.format(
+            "%-20s | %-30s | %-15s | %-10s | %-6s | %-15s | %s",
+            firstName + " " + lastName,
+            address,
+            city,
+            state,
+            zip,
+            phoneNumber,
+            email
+        );
     }
 }
