@@ -122,4 +122,63 @@ public class AddressBook {
         if (sorted.isEmpty()) { System.out.println("No contacts."); return; }
         sorted.forEach(System.out::println);
     }
+
+    // ── UC11 ─────────────────────────────────────────────────────────────────
+
+    /**
+     * UC11: Sort contacts by City using Java Streams and Comparator.
+     */
+    public List<Contact> getSortedByCity() {
+        return contacts.stream()
+                .sorted(Comparator.comparing(c -> c.getCity().toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * UC11: Sort contacts by State using Java Streams and Comparator.
+     */
+    public List<Contact> getSortedByState() {
+        return contacts.stream()
+                .sorted(Comparator.comparing(c -> c.getState().toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * UC11: Sort contacts by Zip using Java Streams and Comparator.
+     */
+    public List<Contact> getSortedByZip() {
+        return contacts.stream()
+                .sorted(Comparator.comparing(Contact::getZip))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * UC11: Display contacts sorted by city.
+     */
+    public void displaySortedByCity() {
+        List<Contact> sorted = getSortedByCity();
+        System.out.println("\n=== [" + name + "] Sorted by City ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts."); return; }
+        sorted.forEach(System.out::println);
+    }
+
+    /**
+     * UC11: Display contacts sorted by state.
+     */
+    public void displaySortedByState() {
+        List<Contact> sorted = getSortedByState();
+        System.out.println("\n=== [" + name + "] Sorted by State ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts."); return; }
+        sorted.forEach(System.out::println);
+    }
+
+    /**
+     * UC11: Display contacts sorted by zip.
+     */
+    public void displaySortedByZip() {
+        List<Contact> sorted = getSortedByZip();
+        System.out.println("\n=== [" + name + "] Sorted by Zip ===");
+        if (sorted.isEmpty()) { System.out.println("No contacts."); return; }
+        sorted.forEach(System.out::println);
+    }
 }
